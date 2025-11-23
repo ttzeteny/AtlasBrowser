@@ -1,0 +1,83 @@
+.root {
+    -fx-font-family: 'Segoe UI', sans-serif;
+    -fx-base: #ffffff;
+    -fx-background-color: #ffffff;
+}
+
+.tab-header-background {
+    -fx-background-color: #dee1e6;
+}
+
+.tab-pane {
+    -fx-tab-max-width: 200px;
+}
+
+.tab {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-padding: 5 10 5 10;
+    -fx-border-width: 0;
+}
+
+.tab:hover {
+    -fx-background-color: #edeff1;
+}
+
+.tab:selected {
+    -fx-background-color: #ffffff;
+    -fx-background-insets: 0;
+}
+
+.tab-label {
+    -fx-text-fill: #3c4043;
+    -fx-font-size: 12px;
+}
+
+#toolbarHBox {
+    -fx-background-color: #ffffff;
+    -fx-padding: 5px 10px 5px 10px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+    -fx-text-fill: #5f6368;
+}
+
+.button:hover {
+    -fx-background-color: #f0f2f5;
+    -fx-text-fill: #202124;
+}
+
+.button:pressed {
+    -fx-background-color: #e8eaed;
+}
+
+.text-field {
+    -fx-background-color: #f1f3f4;
+    -fx-background-radius: 20px;
+    -fx-border-width: 0;
+    -fx-padding: 6px 15px 6px 15px;
+    -fx-prompt-text-fill: #9aa0a6;
+    -fx-text-fill: #202124;
+    -fx-font-size: 13px;
+}
+
+.text-field:focused {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #1a73e8;
+    -fx-border-radius: 20px;
+    -fx-border-width: 2px;
+    -fx-padding: 4px 13px 4px 13px;
+    -fx-effect: dropshadow(three-pass-box, rgba(26,115,232,0.3), 5, 0, 0, 0);
+}
+
+#zoomLabel {
+    -fx-text-fill: #5f6368;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}

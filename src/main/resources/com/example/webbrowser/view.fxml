@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import org.kordamp.ikonli.javafx.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="com.example.webbrowser.Controller">
+
+    <TabPane fx:id="tabPane" tabClosingPolicy="ALL_TABS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    </TabPane>
+
+    <HBox fx:id="toolbarHBox" alignment="CENTER_LEFT" prefHeight="40.0" spacing="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+        </padding>
+
+        <Button onAction="#onHome">
+            <graphic>
+                <FontIcon iconColor="#333333" iconLiteral="fas-home" iconSize="16" />
+            </graphic>
+            <tooltip><Tooltip text="Homepage" /></tooltip>
+        </Button>
+
+        <Button onAction="#onBack">
+            <graphic>
+                <FontIcon iconColor="#333333" iconLiteral="fas-arrow-left" iconSize="16" />
+            </graphic>
+            <tooltip><Tooltip text="Back" /></tooltip>
+        </Button>
+
+        <Button onAction="#onForward">
+            <graphic>
+                <FontIcon iconColor="#333333" iconLiteral="fas-arrow-right" iconSize="16" />
+            </graphic>
+            <tooltip><Tooltip text="Forward" /></tooltip>
+        </Button>
+
+        <Button onAction="#onReload">
+            <graphic>
+                <FontIcon iconColor="#333333" iconLiteral="fas-redo" iconSize="16" />
+            </graphic>
+            <tooltip><Tooltip text="Reload" /></tooltip>
+        </Button>
+
+        <Button onAction="#onHistory">
+            <graphic>
+                <FontIcon iconColor="#333333" iconLiteral="fas-history" iconSize="16" />
+            </graphic>
+            <tooltip><Tooltip text="History" /></tooltip>
+        </Button>
+
+        <TextField fx:id="addressBar" onAction="#onAddressBarAction" HBox.hgrow="ALWAYS" />
+
+        <Button onAction="#onAddressBarAction">
+            <graphic>
+                <FontIcon iconColor="#333333" iconLiteral="fas-search" iconSize="16" />
+            </graphic>
+            <tooltip><Tooltip text="Search" /></tooltip>
+        </Button>
+
+        <Button onAction="#onZoomOut">
+            <graphic>
+                <FontIcon iconColor="#555555" iconLiteral="fas-search-minus" iconSize="14" />
+            </graphic>
+        </Button>
+
+        <Label fx:id="zoomLabel" alignment="CENTER" minWidth="35.0" style="-fx-text-fill: #666666; -fx-font-size: 11px;" text="100%" />
+
+        <Button onAction="#onZoomIn">
+            <graphic>
+                <FontIcon iconColor="#555555" iconLiteral="fas-search-plus" iconSize="14" />
+            </graphic>
+        </Button>
+
+        <Button onAction="#onSettings">
+            <graphic>
+                <FontIcon iconColor="#333333" iconLiteral="fas-cog" iconSize="16" />
+            </graphic>
+            <tooltip><Tooltip text="Settings" /></tooltip>
+        </Button>
+    </HBox>
+
+    <ProgressBar fx:id="progressBar" maxWidth="Infinity" prefHeight="4" progress="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+</AnchorPane>
