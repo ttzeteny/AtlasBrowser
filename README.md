@@ -16,6 +16,8 @@ Atlas comes equipped with essential browsing features wrapped in a clean, flat d
 * **History:** Keeps track of visited pages (per session).
 * **Zoom** Full control over zoom.
 * **Settings:** Customizable homepage.
+* **Dark/Light Mode:** Switch between dark or light mode.
+* **Bookmarks:** Save favorite sites to your bookmarks for quicker access.
 
 ## Tech Stack
 
