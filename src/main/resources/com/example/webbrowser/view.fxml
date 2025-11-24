@@ -62,6 +62,13 @@
             <tooltip><Tooltip text="Search" /></tooltip>
         </Button>
 
+        <Button fx:id="saveButton" onAction="#onSaveBookmark">
+            <graphic>
+                <FontIcon iconColor="#333333" iconLiteral="fas-star" iconSize="16" />
+            </graphic>
+            <tooltip><Tooltip text="Save to bookmarks" /></tooltip>
+        </Button>
+
         <Button onAction="#onZoomOut">
             <graphic>
                 <FontIcon iconColor="#555555" iconLiteral="fas-search-minus" iconSize="14" />
@@ -76,12 +83,21 @@
             </graphic>
         </Button>
 
+        <Button fx:id="themeButton" onAction="#onToggleTheme">
+            <graphic>
+                <FontIcon iconColor="#333333" iconLiteral="fas-moon" iconSize="16" />
+            </graphic>
+            <tooltip><Tooltip text="Dark Mode" /></tooltip>
+        </Button>
+
         <Button onAction="#onSettings">
             <graphic>
                 <FontIcon iconColor="#333333" iconLiteral="fas-cog" iconSize="16" />
             </graphic>
             <tooltip><Tooltip text="Settings" /></tooltip>
         </Button>
+    </HBox>
+    <HBox fx:id="bookmarksHBox" alignment="CENTER_LEFT" prefHeight="25.0" spacing="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
     </HBox>
 
     <ProgressBar fx:id="progressBar" maxWidth="Infinity" prefHeight="4" progress="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />

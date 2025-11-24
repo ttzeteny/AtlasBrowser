@@ -11,7 +11,8 @@ module com.example.webbrowser {
     requires eu.hansolo.tilesfx;
     requires java.prefs;
     requires java.desktop;
+    requires com.google.gson;
 
-    opens com.example.webbrowser to javafx.fxml;
+    opens com.example.webbrowser to javafx.fxml, com.google.gson;
     exports com.example.webbrowser;
 }

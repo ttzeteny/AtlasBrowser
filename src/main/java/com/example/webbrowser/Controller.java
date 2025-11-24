@@ -8,12 +8,18 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebHistory;
 import javafx.stage.Stage;
+
+import java.awt.*;
 import java.util.prefs.Preferences;
 import java.util.Optional;
 import java.io.BufferedInputStream;
@@ -28,7 +34,14 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import java.io.File;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.kordamp.ikonli.javafx.FontIcon;
 import javax.sound.sampled.Clip;
 
 public class Controller {
@@ -43,11 +56,26 @@ public class Controller {
     private ProgressBar progressBar;
     @FXML
     private Label zoomLabel;
+    @FXML
+    private Button themeButton;
+    @FXML
+    private HBox bookmarksHBox;
+    @FXML
+    private Button saveButton;
+    private List<Bookmark> bookmarks = new ArrayList<>();
+    private File bookmarksFile;
     private Tab newTabButton;
+    private boolean isDarkMode;
     private static final String HOME_PAGE_KEY = "homePage";
     private static final String DEFAULT_HOME_PAGE = "https://www.google.com";
+    private static final String DARK_MODE_KEY = "darkMode";
 
     public void initialize() {
+
+        Preferences prefs = Preferences.userNodeForPackage(getClass());
+        isDarkMode = prefs.getBoolean(DARK_MODE_KEY, false);
+
+        Platform.runLater(() -> applyTheme());
 
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
            if (newTab == newTabButton) {
@@ -65,14 +93,21 @@ public class Controller {
                 toolbarHBox.translateYProperty().bind(header.boundsInLocalProperty().map(b -> b.getHeight()));
                 toolbarHBox.toFront();
 
-                progressBar.translateYProperty().bind(Bindings.createDoubleBinding(
+                bookmarksHBox.translateYProperty().bind(Bindings.createDoubleBinding(
                         () -> header.getBoundsInLocal().getHeight() + toolbarHBox.getHeight(),
-                        header.boundsInLocalProperty(),
+                        header.boundsInLocalProperty(), toolbarHBox.heightProperty()
+                ));
+                bookmarksHBox.toFront();
+
+                progressBar.translateYProperty().bind(Bindings.createDoubleBinding(
+                        () -> header.getBoundsInLocal().getHeight() + toolbarHBox.getHeight() + bookmarksHBox.getHeight(),
+                        header.boundsInLocalProperty(), toolbarHBox.heightProperty(), bookmarksHBox.heightProperty(),
                         toolbarHBox.heightProperty()
                 ));
-
                 progressBar.toFront();
             }
+
+            loadBookmarks();
         });
 
         newTabButton = new Tab("+");
@@ -188,6 +223,119 @@ public class Controller {
         if (result.isPresent()) {
             String newUrl = result.get();
             prefs.put(HOME_PAGE_KEY, newUrl);
+        }
+    }
+
+    @FXML
+    private void onSaveBookmark() {
+        WebEngine engine = getCurrentEngine();
+
+        if (engine != null) {
+            String title = engine.getTitle();
+            String url = engine.getLocation();
+
+            if (title != null && url != null) {
+                Bookmark bookmark = new Bookmark(title, url);
+                bookmarks.add(bookmark);
+                saveBookmarksToFile();
+                refreshBookmarksBar();
+            }
+        }
+    }
+
+    private void refreshBookmarksBar() {
+        bookmarksHBox.getChildren().clear();
+
+        for (Bookmark bookmark : bookmarks) {
+            Button btn = new Button(bookmark.getTitle());
+                if (btn.getText().length() > 15) {
+                    btn.setText(btn.getText().substring(0, 15) + "...");
+                }
+                FontIcon icon = new FontIcon("fas-bookmark");
+                btn.setGraphic(icon);
+
+                btn.setOnAction(e -> {
+                    WebEngine engine = getCurrentEngine();
+                    if (engine != null) {
+                        loadPageInEngine(engine, bookmark.getUrl());
+                    }
+                });
+
+                ContextMenu cm = new ContextMenu();
+                MenuItem deleteItem = new MenuItem("delete");
+                deleteItem.setOnAction(e -> {
+                    bookmarks.remove(bookmark);
+                    saveBookmarksToFile();
+                    refreshBookmarksBar();
+                });
+                cm.getItems().add(deleteItem);
+                btn.setContextMenu(cm);
+
+                bookmarksHBox.getChildren().add(btn);
+        }
+    }
+
+    private void saveBookmarksToFile() {
+        try (Writer writer = new FileWriter(bookmarksFile)) {
+            Gson gson = new Gson();
+            gson.toJson(bookmarks, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadBookmarks() {
+        File userDataDir = new File(System.getProperty("user.home"), ".atlasbrowser");
+        if (!userDataDir.exists()) userDataDir.mkdirs();
+
+        bookmarksFile = new File(userDataDir, "bookmarks.json");
+
+        if (bookmarksFile.exists()) {
+            try (Reader reader = new FileReader(bookmarksFile)) {
+                Gson gson = new Gson();
+                bookmarks = gson.fromJson(reader, new TypeToken<List<Bookmark>>(){}.getType());
+                if (bookmarks == null) bookmarks = new ArrayList<>();
+
+                refreshBookmarksBar();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @FXML
+    public void onToggleTheme() {
+        isDarkMode = !isDarkMode;
+
+        Preferences prefs = Preferences.userNodeForPackage(getClass());
+        prefs.putBoolean(DARK_MODE_KEY, isDarkMode);
+
+        applyTheme();
+    }
+
+    public void applyTheme() {
+        if (addressBar.getScene() == null) return;
+
+        ObservableList<String> stylesheets = addressBar.getScene().getStylesheets();
+        stylesheets.clear();
+
+        String cssFile = isDarkMode ? "dark_mode_style.css" : "style.css";
+
+        java.net.URL url = getClass().getResource(cssFile);
+
+        if (url == null) {
+            System.out.println("Css file not found");
+        } else {
+            stylesheets.add(url.toExternalForm());
+        }
+
+        FontIcon icon = (FontIcon) themeButton.getGraphic();
+        if (isDarkMode) {
+            icon.setIconLiteral("fas-sun");
+            themeButton.getTooltip().setText("Light mode");
+        } else {
+            icon.setIconLiteral("fas-moon");
+            themeButton.getTooltip().setText("Dark mode");
         }
     }
 
@@ -348,6 +496,14 @@ public class Controller {
         WebView newWebView = new WebView();
         WebEngine newEngine = newWebView.getEngine();
 
+        File userDataDir = new File(System.getProperty("user.home"), ".atlasbrowser/data");
+
+        if (!userDataDir.exists()) {
+            userDataDir.mkdirs();
+        }
+
+        newEngine.setUserDataDirectory(userDataDir);
+
         newEngine.locationProperty().addListener((obs, oldLocation, newLocation) -> {
             if (isFile(newLocation)) {
                 downloadFile(newLocation);
@@ -385,10 +541,10 @@ public class Controller {
         Platform.runLater(() -> {
             contentRoot.paddingProperty().bind(Bindings.createObjectBinding(() ->
                             new Insets(
-                                    toolbarHBox.getHeight(),
+                                    toolbarHBox.getHeight() + bookmarksHBox.getHeight(),
                                     0, 0, 0
                             ),
-                    toolbarHBox.heightProperty()
+                    toolbarHBox.heightProperty(), bookmarksHBox.heightProperty()
             ));
         });
 
@@ -434,7 +590,7 @@ public class Controller {
     private void updateWindowTitle(String title) {
         if (addressBar.getScene() != null && addressBar.getScene().getWindow() != null) {
             Stage stage = (Stage) addressBar.getScene().getWindow();
-            stage.setTitle("Browser - " + (title != null ? title : "New Tab"));
+            stage.setTitle("Atlas - " + (title != null ? title : "New Tab"));
         }
     }
 
